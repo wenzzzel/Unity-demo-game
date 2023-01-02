@@ -5,6 +5,10 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 
+    public int movementSpeed;
+    public Rigidbody2D rigidBody;
+    private Vector2 movementInput;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -14,13 +18,12 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        movementInput.x = Input.GetAxis("Horizontal");
+        movementInput.y = Input.GetAxis("Vertical");
     }
 
     void FixedUpdate()
     {
-        var xAxis = Input.GetAxis("Horizontal");
-        var yAxis = Input.GetAxis("Vertical");
-        transform.Translate(xAxis/3f, yAxis/3f, 0f);
+        rigidBody.MovePosition(rigidBody.position + movementInput * movementSpeed * Time.fixedDeltaTime);
     }
 }
