@@ -58,3 +58,8 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+#Unity nuget packages
+Unity-demo-game/[Aa]ssets/[Pp]ackages
+
+#Visual Studio Code Settings
+.vscode/
