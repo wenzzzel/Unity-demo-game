@@ -4,7 +4,6 @@ using UnityEngine;
 using Azure.Messaging.WebPubSub;
 using Unity.VisualScripting;
 using System.Threading.Tasks;
-using System.Text.Json;
 using System.Text;
 using System;
 
@@ -14,7 +13,7 @@ public class Player : MonoBehaviour
     public int movementSpeed;
     public Rigidbody2D rigidBody;
     private Vector2 movementInput;
-    private PlayerPosition playerPosition = new PlayerPosition()
+    public PlayerPosition playerPosition = new PlayerPosition()
     {
         PlayerID = Guid.NewGuid(),
         X = 0f,
@@ -46,5 +45,8 @@ public class Player : MonoBehaviour
         playerPosition.Y = rigidBody.position.y;
     }
 
-    private async Task sendPlayerPosition() => await serviceClient.SendToAllAsync(JsonSerializer.Serialize(playerPosition));
+    private async Task sendPlayerPosition()
+    {
+        await serviceClient.SendToAllAsync(JsonUtility.ToJson(playerPosition));
+    }
 }

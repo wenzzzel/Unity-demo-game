@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class PlayerPosition
 {
-    public Guid PlayerID { get; set; }
-    public float X { get; set; }
-    public float Y { get; set; }
+    [SerializeField]
+    public Guid PlayerID;
+    [SerializeField]
+    public float X;
+    [SerializeField]
+    public float Y;
 
 }
