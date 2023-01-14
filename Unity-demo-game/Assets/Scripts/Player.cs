@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     private Vector2 movementInput;
     public PlayerPosition playerPosition = new PlayerPosition()
     {
-        PlayerID = Guid.NewGuid(),
+        PlayerID = Guid.NewGuid().ToString(),
         X = 0f,
         Y = 0f
     };

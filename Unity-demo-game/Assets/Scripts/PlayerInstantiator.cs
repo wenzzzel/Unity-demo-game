@@ -1,16 +1,21 @@
-using UnityEngine;
 using Azure.Messaging.WebPubSub;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Websocket.Client;
 
-public class WebSocketListeningEntity : MonoBehaviour
+public class PlayerInstantiator : MonoBehaviour
 {
-    private PlayerPosition myBroadcastedPosition = new PlayerPosition()
-    {
-        PlayerID = Guid.NewGuid().ToString(),
-        X = 0f,
-        Y = 0f
-    };
+    public Player player;
+    private string localPlayerId;
+
+    private List<PlayerPosition> connectedPlayers = new List<PlayerPosition>();
+
+    public GameObject playerToInstantiate;
+
     private string webSocketConnectionString = @"Endpoint=https://ewenzelwebpubsub.webpubsub.azure.com;AccessKey=E1d65qvhNYr4TQmwBoMH+7rFWz8qMZYYh63NO0dTDNw=;Version=1.0;";
     private string webSocketHub = "hub";
     private WebPubSubServiceClient webSocketServiceClient;
@@ -18,21 +23,19 @@ public class WebSocketListeningEntity : MonoBehaviour
     private WebSocketClient webSocketClient;
     private ConcurrentQueue<string> webSocketQueue;
 
+    // Start is called before the first frame update
     void Start()
     {
+        localPlayerId = player.playerPosition.PlayerID;
+        Debug.Log("PlayerInstantiator says: " + localPlayerId);
         ConnectToWebSocket();
     }
 
+    // Update is called once per frame
     void Update()
     {
         SubscribeToWebsocket();
     }
-
-    void FixedUpdate()
-    {
-        
-    }
-
     private void ConnectToWebSocket()
     {
         webSocketServiceClient = new WebPubSubServiceClient(webSocketConnectionString, webSocketHub);
@@ -50,15 +53,26 @@ public class WebSocketListeningEntity : MonoBehaviour
             while (webSocketQueue.TryPeek(out msg))
             {
                 webSocketQueue.TryDequeue(out msg);
-                MoveMe(msg);
+                CheckForNewPlayers(msg);
             }
         }
     }
 
-    private void MoveMe(string msg)
+    private void CheckForNewPlayers(string msg)
     {
-        Debug.Log("Server: " + msg);
-        JsonUtility.FromJsonOverwrite(msg, myBroadcastedPosition);
-        transform.position = new Vector2(myBroadcastedPosition.X, myBroadcastedPosition.Y);
+        var player = JsonUtility.FromJson<PlayerPosition>(msg);
+
+        if (connectedPlayers.Any(x => x.PlayerID == player.PlayerID))
+            return;
+
+        connectedPlayers.Add(player);
+        Debug.Log("A new player has entered the game! Total count is now: " + connectedPlayers.Count.ToString());
+
+        if (player.PlayerID == localPlayerId)
+            return;
+
+        //Instantiate new GameObject
+        Debug.Log("Instantiating new game object");
+        Instantiate(playerToInstantiate, new Vector2(player.X, player.Y), Quaternion.identity);
     }
 }

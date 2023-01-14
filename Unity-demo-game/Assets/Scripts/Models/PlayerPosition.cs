@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerPosition
 {
     [SerializeField]
-    public Guid PlayerID;
+    public string PlayerID;
     [SerializeField]
     public float X;
     [SerializeField]
